@@ -1,14 +1,21 @@
 import { z } from "zod";
+import { configDotenv } from "dotenv";
+import * as path from "path";
+
+const nodeEnv = process.env.NODE_ENV || "development";
+configDotenv({
+  path: path.resolve(process.cwd(), `.env.${nodeEnv}`),
+});
 
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  PORT: z.int(),
-  DEV_DATABASE_URL: z.url(),
-  DEV_JWT_SECRET: z.string().min(32),
-  PROD_DATABASE_URL: z.url().optional(),
-  PROD_JWT_SECRET: z.string().min(32).optional(),
+  PORT: z.coerce.number().int().positive().default(8000),
+  DATABASE_URL: nodeEnv === "development" ? z.string().optional() : z.string(),
+  BETTER_AUTH_SECRET: z.string(),
+  BETTER_AUTH_URL: z.url(),
+  ALLOWED_ORIGIN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -32,16 +39,11 @@ export const config = {
   isProduction: env.NODE_ENV === "production",
   isTest: env.NODE_ENV === "test",
   database: {
-    url:
-      env.NODE_ENV === "development"
-        ? env.DEV_DATABASE_URL
-        : env.PROD_DATABASE_URL!,
+    url: env.DATABASE_URL,
   },
   jwt: {
-    secret:
-      env.NODE_ENV === "development"
-        ? env.DEV_JWT_SECRET
-        : env.PROD_JWT_SECRET!,
+    betterAuthToken: env.BETTER_AUTH_SECRET,
   },
   port: env.PORT,
+  allowedOrigin: env.ALLOWED_ORIGIN,
 };

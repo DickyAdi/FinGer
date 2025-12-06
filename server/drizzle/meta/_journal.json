@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1764952573768,
+      "tag": "0000_known_ted_forrester",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765035862246,
+      "tag": "0001_tough_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765035920963,
+      "tag": "0002_organic_mattie_franklin",
+      "breakpoints": true
+    }
+  ]
+}

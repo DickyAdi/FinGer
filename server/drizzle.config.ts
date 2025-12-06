@@ -4,9 +4,9 @@ import { config } from "./src/config/env";
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "./src/db/schema.ts",
+  schema: "./src/db/index.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: config.database.url,
+    url: config.database.url!,
   },
 });
