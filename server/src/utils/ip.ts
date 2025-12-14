@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import { getConnInfo } from "hono/bun";
 
 export const getIpForLog = (c: Context) => {
 	const censorIp = (ip: string): string => {
@@ -26,5 +27,7 @@ export const getIpForLog = (c: Context) => {
 	const realIp = c.req.header("x-real-ip");
 	if (realIp) return censorIp(realIp);
 
-	return censorIp(c.env?.REMOTE_ADDR || "0.0.0.0");
+	const connInfo = getConnInfo(c);
+
+	return censorIp(connInfo.remote.address || "0.0.0.0");
 };

@@ -2,7 +2,7 @@ import { text, numeric, index, pgTable, timestamp } from "drizzle-orm/pg-core";
 import { transactions } from "./transactions";
 
 export const expenses = pgTable(
-	"incomes",
+	"expenses",
 	{
 		id: text("id").primaryKey(),
 		name: text("name").notNull(),

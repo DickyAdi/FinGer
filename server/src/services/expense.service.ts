@@ -1,5 +1,5 @@
 import { db, transactions, expenses } from "../db";
-import { eq, getTableColumns } from "drizzle-orm";
+import { count, desc, eq, getTableColumns } from "drizzle-orm";
 
 export class ExpenseService {
 	async getExpensesByUserId(
@@ -7,13 +7,28 @@ export class ExpenseService {
 		page: number = 1,
 		limit: number = 20,
 	) {
-		return await db
+		const paginatedResult = await db
 			.select({ ...getTableColumns(expenses) })
 			.from(expenses)
 			.innerJoin(transactions, eq(transactions.id, expenses.transactionId))
 			.where(eq(transactions.user_id, user_id))
-			.orderBy(expenses.created_at)
+			.orderBy(desc(expenses.created_at))
 			.offset((page - 1) * limit)
 			.limit(limit);
+
+		const [{ total }] = await db
+			.select({ total: count(expenses.id) })
+			.from(expenses)
+			.innerJoin(transactions, eq(transactions.id, expenses.transactionId))
+			.where(eq(transactions.user_id, user_id));
+
+		const data = {
+			total,
+			page,
+			limit,
+			data: paginatedResult,
+		};
+
+		return data;
 	}
 }

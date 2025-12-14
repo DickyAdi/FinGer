@@ -18,8 +18,14 @@ transactionRouter.use("*", requireAuth);
 transactionRouter.get("/", zValidator("query", PaginationSchema), async (c) => {
 	const { page, limit } = c.req.valid("query");
 
+	const user = c.get("user");
+
+	if (!user) {
+		throw new NotAuthenticatedError();
+	}
+
 	const paginatedTrx = await transactionService.getByUserId(
-		c.get("user").id,
+		user.id,
 		page,
 		limit,
 	);

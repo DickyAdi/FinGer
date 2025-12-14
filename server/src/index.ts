@@ -20,9 +20,9 @@ app.use(
 
 app.get("/doc", (c) => c.json(openApiDoc));
 app.get("/ui", swaggerUI({ url: "/doc" }));
-app.get("/", (c) => {
+app.get("/api/health", (c) => {
 	return c.json({
-		message: "Hello world from bun/hono",
+		status: "OK",
 	});
 });
 

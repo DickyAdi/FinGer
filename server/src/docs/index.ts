@@ -2,6 +2,10 @@ import { transactionSchemas } from "./schemas/transactions.doc.schema";
 import { transactionParameters } from "./parameters/transactions.doc.parameter";
 import { healthPaths } from "./paths/health.doc.path";
 import { transactionPaths } from "./paths/transactions.doc.path";
+import { incomeSchemas } from "./schemas/incomes.doc.schema";
+import { incomePaths } from "./paths/incomes.doc.path";
+import { expensePaths } from "./paths/expenses.doc.path";
+import { expenseSchemas } from "./schemas/expenses.doc.schema";
 
 const openApiDoc = {
 	openapi: "3.0.0",
@@ -27,6 +31,8 @@ const openApiDoc = {
 		},
 		schemas: {
 			...transactionSchemas,
+			...incomeSchemas,
+			...expenseSchemas,
 		},
 		parameters: {
 			...transactionParameters,
@@ -40,6 +46,8 @@ const openApiDoc = {
 	paths: {
 		...healthPaths,
 		...transactionPaths,
+		...incomePaths,
+		...expensePaths,
 	},
 };
 

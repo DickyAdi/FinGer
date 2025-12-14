@@ -81,7 +81,7 @@ export class TransactionService {
 
 			await tx
 				.update(users)
-				.set({ balance: sql`${users.balance} + ${expense_dto.amount}` })
+				.set({ balance: sql`${users.balance} - ${expense_dto.amount}` })
 				.where(eq(users.id, user_id));
 
 			return {
@@ -94,11 +94,41 @@ export class TransactionService {
 	async update() {} //i dont think i need update service in transactions, This only works on income and expense
 
 	async delete(id: string) {
-		const [result] = await db
-			.delete(transactions)
-			.where(eq(transactions.id, id))
-			.returning();
-		return !!result;
+		const result = await db.transaction(async (tx) => {
+			const [{ trx, amount }] = await tx
+				.select({
+					trx: { ...getTableColumns(transactions) },
+					amount: sql`COALESCE(${incomes.amount}, ${expenses.amount})`.as(
+						"amount",
+					),
+				})
+				.from(transactions)
+				.leftJoin(incomes, eq(incomes.transactionId, transactions.id))
+				.leftJoin(expenses, eq(expenses.transactionId, transactions.id))
+				.where(eq(transactions.id, id))
+				.limit(1);
+
+			if (trx.type === "expense") {
+				await tx
+					.update(users)
+					.set({ balance: sql`${users.balance} + ${amount}` })
+					.where(eq(users.id, trx.user_id));
+			} else if (trx.type === "income") {
+				await tx
+					.update(users)
+					.set({ balance: sql`${users.balance} - ${amount}` })
+					.where(eq(users.id, trx.user_id));
+			}
+
+			const innerResult = await tx
+				.delete(transactions)
+				.where(eq(transactions.id, id))
+				.returning();
+
+			return !!innerResult.length;
+		});
+
+		return result;
 	}
 
 	async getById(id: string) {
